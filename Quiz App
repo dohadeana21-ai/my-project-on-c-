@@ -1,0 +1,73 @@
+#include <bits/stdc++.h>
+#include <windows.h>
+using namespace std;
+void setColor(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
+struct Question {
+    string question;
+    string choice[3];
+    char correctanswer;
+};
+int main()
+{
+    cout<<"=== Quiz App ===="<<endl;
+
+    Question question[2];
+    question[0].question = "What does OOP stand for?";
+
+    question[0].choice[0] = "Object Oriented Programming";
+   question[0].choice[1] = "Only One Program";
+    question[0].choice[2] = "Open Output Protocol";
+
+    question[0].correctanswer = 'a';
+
+    question[1].question = "Which keyword defines a class in C++?";
+
+    question[1].choice[0] = "function";
+    question[1].choice[1] = "class";
+    question[1].choice[2] = "struct only";
+
+    question[1].correctanswer = 'b';
+
+
+    int score=0;
+
+    for(int j=0;j<2;j++){
+        cout<<"Q"<<j+1<<": "<<question[j].question<<endl;
+    for(int i=0;i<=2;i++) {
+        cout<<char('a'+i)<<")"<<question[j].choice[i]<<endl;
+    }
+    char answer;
+    cout<<"Your answer:";
+    cin>>answer;
+        /*
+        لو دخل الحرف صح بس capital
+        */
+        answer = tolower(answer);
+        /*
+         لو دخل حرف مختلف عن الاختيارات
+         */
+        while (answer != 'a' && answer != 'b' && answer != 'c') {
+            cout<<"Please try again: ";
+            cin>>answer;
+            answer = tolower(answer);
+        }
+
+    if (answer == question[j].correctanswer) {
+        setColor(10);
+        cout<<"Correct!"<<endl;
+        score++;
+    }else {
+        setColor(12);
+        cout<<"Wrong! Correct answer:"<<question[j].correctanswer<<endl;
+    }
+        setColor(7);
+    }
+
+    cout<<"=== Quiz Complete ==="<<endl;
+    cout<<"Score: "<<score<<"/2"<<endl;
+
+    return 0;
+}
