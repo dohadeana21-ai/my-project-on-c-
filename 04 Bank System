@@ -1,0 +1,122 @@
+#include <bits/stdc++.h>
+#include <windows.h>
+using namespace std;
+void setColor(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
+class Account
+{
+    private:
+    string name;
+    double balance;
+    public:
+   /*
+    دا constructor عشان نضيف اسم ورقم للحساب ولو الرقم دخل ب السالب هيعتبره صفر لان مفيش حساب بيبدا بالسلاب 
+    */
+    Account(string n, double b) {
+        name = n;
+        if (b>=0){
+        balance = b;
+        } else {
+            balance = 0;
+        }
+    }
+    /*
+     دى داله للايداع  
+    */
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            setColor(10);
+            cout << "Deposited "<<amount<<" EGP."<<" New balance:"<<balance<<" EGP" << endl;
+        }
+        else {
+            setColor(12);
+            cout << "Error: Amount must be greater than 0." << endl;
+        } setColor(7);
+    }
+    /*
+    دى داله للسحب   
+   */
+    void withdraw(double amount) {
+        if (amount <= 0) {
+            setColor(12);
+            cout << "Error: Amount must be greater than 0!" << endl;
+        }
+        else if (amount > balance) {
+            setColor(12);
+            cout << "Error: Insufficient funds. Current balance: "
+                 << balance << " EGP" << endl;
+        }
+        else {
+            balance -= amount;
+            setColor(10);
+            cout << "Withdraw successful! "<<" New balance:"<<balance<<" EGP"  << endl;
+        }
+        setColor(7);
+    }
+    /*
+    دى داله للاستعلام  
+   */
+    void checkBalance() {
+        setColor(10);
+        cout<< "Current balance: "<< balance<<" EGP" << endl;
+        setColor(7);
+    }
+};
+/*
+    دى داله بترجع قيمه الاختيار  
+   */
+int print() {
+    cout<<"\n"<<"Choose an option: ";
+    int choice;
+    cin>>choice;
+    return choice;
+}
+
+int main()
+{
+    Account account1("doha",1000);
+
+    cout<<"=== Bank System ===="<<endl;
+
+    cout<<"1. Deposit"<<endl;
+    cout<<"2. Withdraw"<<endl;
+    cout<<"3. Check Balance"<<endl;
+    cout<<"4. Exit"<<endl;
+
+    int choice;
+    choice = print();
+
+    while (choice != 4) {
+
+    if (choice==1)
+    {
+        double amount;
+        cout<<"Enter amount to deposit: ";
+        cin>>amount;
+        account1.deposit(amount);
+    }
+        else if (choice==2)
+        {
+        double amount;
+        cout<<"Enter amount to withdraw: ";
+        cin>>amount;
+        account1.withdraw(amount);
+    }
+        else if (choice==3)
+        {
+        account1.checkBalance();
+    }
+        else
+        {
+        cout<<"Error! bleace Choose an option of: ( 1 or 2 or 3 or 4 "<<endl;
+    }
+        choice = print();
+    }
+    setColor(10);
+    cout<<"Goodbye!"<<endl;
+
+    return 0;
+}
