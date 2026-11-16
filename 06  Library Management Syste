@@ -1,0 +1,772 @@
+#include <bits/stdc++.h>
+#include <windows.h>
+using namespace std;
+
+void setColor(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
+
+class Book {
+private:
+    string title;
+    string author;
+    bool available;
+
+public:
+    Book(string t, string a) {
+        title = t;
+        author = a;
+        available = true;
+    }
+
+    string getTitle() {
+        return title;
+    }
+
+    string getAuthor() {
+        return author;
+    }
+
+    bool getAvailable() {
+        return available;
+    }
+
+    // استعارة الكتاب لو كان متاحًا
+    bool borrowBook() {
+        if (available == true) {
+            available = false;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // إرجاع الكتاب لو كان مستعارًا
+    bool returnBook() {
+        if (available == false) {
+            available = true;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // عرض بيانات كتاب واحد
+    void displayBook() {
+        cout << "Book title: " << title << endl;
+        cout << "Author: " << author << endl;
+
+        if (available == true) {
+            setColor(10);
+            cout << "Status: Available" << endl;
+        }
+        else {
+            setColor(12);
+            cout << "Status: Borrowed" << endl;
+        }
+
+        setColor(7);
+    }
+};
+
+class Member {
+private:
+    string name;
+    vector<string> borrowedBooks;
+
+public:
+    Member(string n) {
+        name = n;
+    }
+
+    string getName() {
+        return name;
+    }
+
+    vector<string> getBorrowedBooks() {
+        return borrowedBooks;
+    }
+
+    // إضافة كتاب إلى قائمة الكتب المستعارة
+    void addBorrowedBook(string bookTitle) {
+        borrowedBooks.push_back(bookTitle);
+    }
+
+    // حذف كتاب من قائمة الكتب المستعارة
+    void removeBorrowedBook(string bookTitle) {
+        for (int i = 0; i < borrowedBooks.size(); i++) {
+            if (bookTitle == borrowedBooks[i]) {
+                borrowedBooks.erase(borrowedBooks.begin() + i);
+                break;
+            }
+        }
+    }
+};
+
+// ==================== Member Functions ====================
+
+// إضافة عضو جديد
+void addMember(vector<Member>& members) {
+    string name;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "Enter member name: ";
+    getline(cin, name);
+
+    // التأكد من عدم تسجيل نفس العضو مرتين
+    for (int i = 0; i < members.size(); i++) {
+        if (members[i].getName() == name) {
+            setColor(12);
+            cout << "This member already exists." << endl;
+            setColor(7);
+            return;
+        }
+    }
+
+    members.push_back(Member(name));
+
+    setColor(10);
+    cout << "Member \"" << name << "\" added." << endl;
+    setColor(7);
+}
+
+// حذف عضو
+void removeMember(vector<Member>& members) {
+    string name;
+    bool found = false;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "Enter member name: ";
+    getline(cin, name);
+
+    for (int i = 0; i < members.size(); i++) {
+        if (members[i].getName() == name) {
+            found = true;
+
+            // التأكد إن العضو ليس لديه كتب مستعارة
+            if (members[i].getBorrowedBooks().empty()) {
+                members.erase(members.begin() + i);
+
+                setColor(10);
+                cout << "Member \"" << name << "\" removed." << endl;
+                setColor(7);
+            }
+            else {
+                setColor(12);
+                cout << "Cannot remove this member. "
+                     << "The member still has borrowed books." << endl;
+                setColor(7);
+            }
+
+            break;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << "No member exists with this name." << endl;
+        setColor(7);
+    }
+}
+
+// البحث عن عضو
+void searchMember(vector<Member>& members) {
+    string name;
+    bool found = false;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "Enter member name: ";
+    getline(cin, name);
+
+    for (int i = 0; i < members.size(); i++) {
+        if (members[i].getName() == name) {
+            found = true;
+
+            setColor(10);
+            cout << "Member Name: " << members[i].getName() << endl;
+            setColor(7);
+
+            vector<string> borrowed = members[i].getBorrowedBooks();
+
+            cout << "Borrowed Books:" << endl;
+
+            if (borrowed.empty()) {
+                cout << "No borrowed books." << endl;
+            }
+            else {
+                for (int j = 0; j < borrowed.size(); j++) {
+                    cout << borrowed[j] << endl;
+                }
+            }
+
+            break;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << "No member exists." << endl;
+        setColor(7);
+    }
+}
+
+// عرض جميع الأعضاء
+void displayMember(vector<Member>& members) {
+    if (members.empty()) {
+        setColor(12);
+        cout << "This list is empty. No members available." << endl;
+        setColor(7);
+        return;
+    }
+
+    for (int i = 0; i < members.size(); i++) {
+        setColor(10);
+        cout << "\n========== Member " << i + 1 << " ==========" << endl;
+
+        setColor(13);
+        cout << "Name: " << members[i].getName() << endl;
+
+        setColor(14);
+        cout << "Borrowed Books:" << endl;
+
+        vector<string> borrowed = members[i].getBorrowedBooks();
+
+        if (borrowed.empty()) {
+            cout << "No borrowed books." << endl;
+        }
+        else {
+            for (int j = 0; j < borrowed.size(); j++) {
+                cout << borrowed[j] << endl;
+            }
+        }
+
+        setColor(7);
+    }
+}
+
+// ==================== Book Functions ====================
+
+// إضافة كتاب
+void addBook(vector<Book>& books) {
+    string title;
+    string author;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "Enter book title: ";
+    getline(cin, title);
+
+    cout << "Enter book author: ";
+    getline(cin, author);
+
+    books.push_back(Book(title, author));
+
+    setColor(10);
+    cout << "Book \"" << title << "\" added." << endl;
+    setColor(7);
+}
+
+// حذف كتاب
+void removeBook(vector<Book>& books) {
+    string search;
+    string title;
+    bool found = false;
+    bool searchByAuthor = false;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "Enter book title or book author: ";
+    getline(cin, search);
+
+    for (int i = 0; i < books.size(); i++) {
+
+        if (books[i].getTitle() == search) {
+            found = true;
+            title = books[i].getTitle();
+
+            if (books[i].getAvailable()) {
+                books.erase(books.begin() + i);
+
+                setColor(10);
+                cout << "Book \"" << title << "\" removed." << endl;
+                setColor(7);
+            }
+            else {
+                setColor(12);
+                cout << "Cannot remove \"" << title
+                     << "\". It is currently borrowed." << endl;
+                setColor(7);
+            }
+
+            return;
+        }
+
+        else if (books[i].getAuthor() == search) {
+            cout << books[i].getTitle() << endl;
+            found = true;
+            searchByAuthor = true;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << "Book or author \"" << search << "\" does not exist." << endl;
+        setColor(7);
+        return;
+    }
+
+    if (searchByAuthor == true) {
+        cout << "Enter which book title: ";
+        getline(cin, title);
+
+        for (int i = 0; i < books.size(); i++) {
+            if (books[i].getTitle() == title &&
+                books[i].getAuthor() == search) {
+
+                if (books[i].getAvailable()) {
+                    books.erase(books.begin() + i);
+
+                    setColor(10);
+                    cout << "Book \"" << title << "\" removed." << endl;
+                    setColor(7);
+                }
+                else {
+                    setColor(12);
+                    cout << "Cannot remove \"" << title
+                         << "\". It is currently borrowed." << endl;
+                    setColor(7);
+                }
+
+                return;
+            }
+        }
+
+        setColor(12);
+        cout << "Book \"" << title
+             << "\" does not exist for this author." << endl;
+        setColor(7);
+    }
+}
+
+// استعارة كتاب
+void borrowBook(vector<Book>& books, vector<Member>& members) {
+    string name;
+    string search;
+    string title;
+    bool found = false;
+    bool searchByAuthor = false;
+    int memberIndex = -1;
+
+    cout << "Enter your name: ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, name);
+
+    // التأكد من وجود العضو
+    for (int i = 0; i < members.size(); i++) {
+        if (members[i].getName() == name) {
+            found = true;
+            memberIndex = i;
+            break;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << name << " you are not a member, so you cannot borrow books." << endl;
+        setColor(7);
+        return;
+    }
+
+    cout << "Enter book title or book author: ";
+    getline(cin, search);
+
+    found = false;
+
+    // البحث عن الكتاب بالعنوان أو المؤلف
+    for (int i = 0; i < books.size(); i++) {
+
+        if (books[i].getTitle() == search) {
+            found = true;
+            title = books[i].getTitle();
+
+            if (books[i].borrowBook()) {
+                members[memberIndex].addBorrowedBook(title);
+
+                setColor(10);
+                cout << "\"" << title << "\" borrowed successfully." << endl;
+                setColor(7);
+            }
+            else {
+                setColor(12);
+                cout << "\"" << title << "\" is already on loan." << endl;
+                setColor(7);
+            }
+
+            return;
+        }
+
+        else if (books[i].getAuthor() == search) {
+            cout << books[i].getTitle() << endl;
+            found = true;
+            searchByAuthor = true;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << "Book or author \"" << search << "\" does not exist." << endl;
+        setColor(7);
+        return;
+    }
+
+    // لو البحث باسم المؤلف
+    if (searchByAuthor == true) {
+        cout << "Enter which book title: ";
+        getline(cin, title);
+
+        for (int i = 0; i < books.size(); i++) {
+            if (books[i].getTitle() == title &&
+                books[i].getAuthor() == search) {
+
+                if (books[i].borrowBook()) {
+                    members[memberIndex].addBorrowedBook(title);
+
+                    setColor(10);
+                    cout << "\"" << title << "\" borrowed successfully." << endl;
+                    setColor(7);
+                }
+                else {
+                    setColor(12);
+                    cout << "\"" << title << "\" is already on loan." << endl;
+                    setColor(7);
+                }
+
+                return;
+            }
+        }
+
+        setColor(12);
+        cout << "Book \"" << title
+             << "\" does not exist for this author." << endl;
+        setColor(7);
+    }
+}
+
+// إرجاع كتاب
+void returnBook(vector<Book>& books, vector<Member>& members) {
+    string name;
+    string search;
+    string title;
+    bool found = false;
+    bool searchByAuthor = false;
+    int memberIndex = -1;
+
+    cout << "Enter your name: ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, name);
+
+    // التأكد من وجود العضو
+    for (int i = 0; i < members.size(); i++) {
+        if (members[i].getName() == name) {
+            found = true;
+            memberIndex = i;
+            break;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << name << " you are not a member, so you cannot return books." << endl;
+        setColor(7);
+        return;
+    }
+
+    cout << "Enter book title or book author: ";
+    getline(cin, search);
+
+    found = false;
+
+    // البحث عن الكتاب بالعنوان أو المؤلف
+    for (int i = 0; i < books.size(); i++) {
+
+        if (books[i].getTitle() == search) {
+            found = true;
+            title = books[i].getTitle();
+
+            vector<string> borrowed = members[memberIndex].getBorrowedBooks();
+            bool borrowedByMember = false;
+
+            // التأكد إن العضو استعار الكتاب
+            for (int j = 0; j < borrowed.size(); j++) {
+                if (borrowed[j] == title) {
+                    borrowedByMember = true;
+                    break;
+                }
+            }
+
+            if (borrowedByMember == true && books[i].returnBook()) {
+                members[memberIndex].removeBorrowedBook(title);
+
+                setColor(10);
+                cout << "Book \"" << title << "\" returned successfully." << endl;
+                setColor(7);
+            }
+            else {
+                setColor(12);
+                cout << "Cannot return \"" << title
+                     << "\". This book is not in your borrow list." << endl;
+                setColor(7);
+            }
+
+            return;
+        }
+
+        else if (books[i].getAuthor() == search) {
+            cout << books[i].getTitle() << endl;
+            found = true;
+            searchByAuthor = true;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << "Book or author \"" << search << "\" does not exist." << endl;
+        setColor(7);
+        return;
+    }
+
+    // لو البحث باسم المؤلف
+    if (searchByAuthor == true) {
+        cout << "Enter which book title: ";
+        getline(cin, title);
+
+        for (int i = 0; i < books.size(); i++) {
+            if (books[i].getTitle() == title &&
+                books[i].getAuthor() == search) {
+
+                vector<string> borrowed = members[memberIndex].getBorrowedBooks();
+                bool borrowedByMember = false;
+
+                // التأكد إن العضو استعار الكتاب
+                for (int j = 0; j < borrowed.size(); j++) {
+                    if (borrowed[j] == title) {
+                        borrowedByMember = true;
+                        break;
+                    }
+                }
+
+                if (borrowedByMember == true && books[i].returnBook()) {
+                    members[memberIndex].removeBorrowedBook(title);
+
+                    setColor(10);
+                    cout << "Book \"" << title << "\" returned successfully." << endl;
+                    setColor(7);
+                }
+                else {
+                    setColor(12);
+                    cout << "Cannot return \"" << title
+                         << "\". This book is not in your borrow list." << endl;
+                    setColor(7);
+                }
+
+                return;
+            }
+        }
+
+        setColor(12);
+        cout << "Book \"" << title
+             << "\" does not exist for this author." << endl;
+        setColor(7);
+    }
+}
+
+// البحث عن كتاب
+void searchBook(vector<Book>& books) {
+    string search;
+    string title;
+    bool found = false;
+    bool searchByAuthor = false;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "Enter book title or book author: ";
+    getline(cin, search);
+
+    // البحث بالعنوان أو المؤلف
+    for (int i = 0; i < books.size(); i++) {
+
+        if (books[i].getTitle() == search) {
+            found = true;
+            books[i].displayBook();
+            return;
+        }
+
+        else if (books[i].getAuthor() == search) {
+            cout << books[i].getTitle() << endl;
+            found = true;
+            searchByAuthor = true;
+        }
+    }
+
+    if (found == false) {
+        setColor(12);
+        cout << "Book or author \"" << search << "\" does not exist." << endl;
+        setColor(7);
+        return;
+    }
+
+    // لو البحث باسم المؤلف
+    if (searchByAuthor == true) {
+        cout << "Enter which book title: ";
+        getline(cin, title);
+
+        found = false;
+
+        for (int i = 0; i < books.size(); i++) {
+            if (books[i].getTitle() == title &&
+                books[i].getAuthor() == search) {
+
+                found = true;
+                books[i].displayBook();
+                return;
+            }
+        }
+
+        if (found == false) {
+            setColor(12);
+            cout << "Book \"" << title
+                 << "\" does not exist for this author." << endl;
+            setColor(7);
+        }
+    }
+}
+
+// عرض جميع الكتب
+void displayAllBooks(vector<Book>& books) {
+    if (books.empty()) {
+        setColor(12);
+        cout << "The library is empty. No books available." << endl;
+        setColor(7);
+        return;
+    }
+
+    for (int i = 0; i < books.size(); i++) {
+        cout << "\n========== Book " << i + 1 << " ==========" << endl;
+        books[i].displayBook();
+    }
+}
+int print() {
+    int choice;
+
+    cout << "\nChoose an option: ";
+    cin >> choice;
+
+    return choice;
+}
+
+int main() {
+    vector<Book> books;
+    vector<Member> members;
+
+    int choice;
+
+    do {
+        cout << "\n=== Library Management System ===" << endl;
+        cout << "1. Books" << endl;
+        cout << "2. Members" << endl;
+        cout << "3. Exit" << endl;
+
+        choice = print();
+
+        if (choice == 1) {
+            do {
+                cout << "\n=== Books Menu ===" << endl;
+                cout << "1. Add Book" << endl;
+                cout << "2. Remove Book" << endl;
+                cout << "3. Borrow Book" << endl;
+                cout << "4. Return Book" << endl;
+                cout << "5. Search Book" << endl;
+                cout << "6. Display All Books" << endl;
+                cout << "7. Back to Main Menu" << endl;
+
+                choice = print();
+
+                if (choice == 1) {
+                    addBook(books);
+                }
+                else if (choice == 2) {
+                    removeBook(books);
+                }
+                else if (choice == 3) {
+                    borrowBook(books, members);
+                }
+                else if (choice == 4) {
+                    returnBook(books, members);
+                }
+                else if (choice == 5) {
+                    searchBook(books);
+                }
+                else if (choice == 6) {
+                    displayAllBooks(books);
+                }
+                else if (choice != 7) {
+                    setColor(12);
+                    cout << "Error! Please choose an option from 1 to 7." << endl;
+                    setColor(7);
+                }
+
+            } while (choice != 7);
+        }
+        
+        else if (choice == 2) {
+            do {
+                cout << "\n=== Members Menu ===" << endl;
+                cout << "1. Add Member" << endl;
+                cout << "2. Remove Member" << endl;
+                cout << "3. Search Member" << endl;
+                cout << "4. Display All Members" << endl;
+                cout << "5. Back to Main Menu" << endl;
+
+                choice = print();
+
+                if (choice == 1) {
+                    addMember(members);
+                }
+                else if (choice == 2) {
+                    removeMember(members);
+                }
+                else if (choice == 3) {
+                    searchMember(members);
+                }
+                else if (choice == 4) {
+                    displayMember(members);
+                }
+                else if (choice != 5) {
+                    setColor(12);
+                    cout << "Error! Please choose an option from 1 to 5." << endl;
+                    setColor(7);
+                }
+
+            } while (choice != 5);
+        }
+
+        else if (choice != 3) {
+            setColor(12);
+            cout << "Error! Please choose an option from 1 to 3." << endl;
+            setColor(7);
+        }
+
+    } while (choice != 3);
+
+    setColor(10);
+    cout << "Goodbye!" << endl;
+    setColor(7);
+
+    return 0;
+}
